@@ -1,3 +1,6 @@
+
+**This is a forked project mainly to provide extra information for users whose host-machine environment is Microsoft Windows.**
+
 # The Dataverse Network (DVN) Install Demo
 
 "The Dataverse Network is an open source application to publish, share, reference, extract and analyze research data." -- http://thedata.org
@@ -23,6 +26,12 @@ FIXME: Right now you'll need a 64 bit "host" operating system. For discussion of
 
 ## Using this git repo to practice installing a DVN 
 
+**Caution 1: If your VirbutalBox is running on a Microsoft windows machine, start your VirtualBox before you follow Vagrant-related steps listed below; Otherwise, the vagrant-up step might prematurely end with an iptables-related error message.**
+
+**Caution 2: The following vagrant-step executes at least one locally saved BASH shell script file on the guest (Linux) machine.  To avoid a line-terminator-related script error, you should clone the demo project without converting line-terminators to the Windows style.**
+
+**Caution 3: The following vagrant-up step itself does \*not\* complete the installation of a DVN; after the vagrant-up step successfully finishes, then you must vagrant ssh to the guest machine and semi-automatically install GlassFish, Dataverse, and other required components.**
+
 After running the commands below you should be able to log in:
 
 - <http://localhost:8888/dvn/>
@@ -31,30 +40,42 @@ After running the commands below you should be able to log in:
 
 Please note that the first few commands are executed from a Mac called "murphy" but following `vagrant ssh` the rest of the commands are executed on the newly-created VM itself ("logus"). Output has been trimmed for clarity.
 
-    murphy:~ pdurbin$ cd git clone https://github.com/dvn/dvn-install-demo.git
+    murphy:~ pdurbin$ git clone https://github.com/dvn/dvn-install-demo.git
     murphy:~ cd dvn-install-demo
     murphy:dvn-install-demo pdurbin$ vagrant up
+    
     [default] Importing base box 'puppet-vagrant-boxes-centos-64-x64-vbox4210'...
     notice: /Stage[postgres]/Postgres/Service[postgresql]/ensure: ensure changed 'stopped' to 'running'
     notice: /Stage[glassfish]/Glassfish/Exec[install_glassfish]/returns: executed successfully
     notice: Finished catalog run in 396.66 seconds
+    
     murphy:dvn-install-demo pdurbin$ 
+    
     murphy:dvn-install-demo pdurbin$ vagrant ssh
+    
     Last login: Tue Jul 10 22:56:01 2012 from 10.0.2.2
+    
     [vagrant@logus ~]$ sudo su -
     [root@logus ~]# ls
+    
     anaconda-ks.cfg            glassfish-answerfile  install.log.syslog
     dvninstall_v3_6.zip      glassfish-install.sh
     glassfish-3.1.2.2-unix.sh  install.log
+    
     [root@logus ~]# jar xvf dvninstall_v3_6.zip
+    
      inflated: dvninstall/domain.xml.TEMPLATE
      ...
      inflated: dvninstall/appdeploy/AS.properties.TEMPLATE
+     
     [root@logus ~]# cd dvninstall
+    
     [root@logus dvninstall]# ls
+    
     appdeploy  domain.xml.TEMPLATE  referenceData.sql.TEMPLATE
     config     install              robots.txt
     doc        pgdriver             web-core.jar
+    
     [root@logus dvninstall]# perl install
 
     Welcome to the DVN installer.
@@ -285,16 +306,39 @@ Please note that the first few commands are executed from a Mac called "murphy" 
     and analysis on quantitative data will not be available.
     Please consult the "Installing R" section in the Installers guide
     for more info.
+    
     [root@logus dvninstall]# 
+    
     [root@logus dvninstall]# elinks --dump http://localhost/dvn/ | head -3
+    
                                       [1]Powered by the Dataverse Network Project
                                                                          v. 3.6
+
+To access GlassFish's admin console (http://localhost:4848), the following steps are necessary.
+
+	[root@localhost ~]# cd /usr/local/glassfish3/bin
+	
+	[root@localhost bin]# ./asadmin enable-secure-admin
+	Enter admin user name>  admin
+	Enter admin password for user "admin">
+	You must restart all running servers for the change 
+	in secure admin to take effect.
+	Command enable-secure-admin executed successfully.
+	
+	[root@localhost bin]# ./asadmin restart-domain
+	Successfully restarted the domain
+	Command restart-domain executed successfully.
+
+
+
+
 
 ## Starting the VM again after it has been shut down
 
 If you've stopped the VM and later want to resume working on it you'll want to type `vagrant up` to start it...
 
     [pdurbin@tabby dvn-install-demo]$ vagrant up
+
     [default] VM already created. Booting if it's not already running...
     [default] Clearing any previously set forwarded ports...
     [default] Forwarding ports...
@@ -317,9 +361,13 @@ If you've stopped the VM and later want to resume working on it you'll want to t
 ... but by default, Glassfish does not start at boot so you won't be able to reach <http://localhost:8888/dvn/>. To start Glassfish, we `vagrant ssh` to to VM, become root, and start Glassfish with `asadmin`:
 
     [pdurbin@tabby dvn-install-demo]$ vagrant ssh
+
     Last login: Wed Jan 23 04:14:47 2013 from 10.0.2.2
+
     [vagrant@localhost ~]$ sudo su -
+
     [root@localhost ~]# /usr/local/glassfish3/glassfish/bin/asadmin start-domain
+
     Waiting for domain1 to start ...............................................................................
     Successfully started the domain : domain1
     domain  Location: /usr/local/glassfish3/glassfish/domains/domain1
@@ -327,6 +375,7 @@ If you've stopped the VM and later want to resume working on it you'll want to t
     Admin Port: 4848
     Debugging is enabled.  The debugging port is: 9009
     Command start-domain executed successfully.
+
     [root@localhost ~]# 
 
 ## API Testing
