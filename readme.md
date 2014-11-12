@@ -1,5 +1,5 @@
 
-**This is a forked project mainly to provide extra information for users whose host-machine environment is Microsoft Windows.**
+**This forked project aims at providing extra information for users whose host-machine environment is Microsoft Windows.**
 
 # The Dataverse Network (DVN) Install Demo
 
@@ -48,8 +48,11 @@ Please note that the first few commands are executed from a Mac called "murphy" 
     notice: /Stage[postgres]/Postgres/Service[postgresql]/ensure: ensure changed 'stopped' to 'running'
     notice: /Stage[glassfish]/Glassfish/Exec[install_glassfish]/returns: executed successfully
     notice: Finished catalog run in 396.66 seconds
-    
     murphy:dvn-install-demo pdurbin$ 
+    
+    
+    
+    
     
     murphy:dvn-install-demo pdurbin$ vagrant ssh
     
